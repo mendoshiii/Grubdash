@@ -54,7 +54,8 @@ const validateQuantity = (req, res, next) => {
 const create = (req, res) => {
   const { data: { deliverTo, mobileNumber, dishes, status } = {} } = req.body;
   const newOrder = {
-    id: nextId(),
+    // sets to a default new order
+    id: nextId(), // id from imported function
     deliverTo,
     mobileNumber,
     dishes,
@@ -66,7 +67,7 @@ const create = (req, res) => {
 
 // GET request for all orders
 const list = (req, res) => {
-  res.json({ data: orders });
+  res.json({ data: orders }); // returns all orders data
 };
 
 // Validate if order exists
@@ -74,10 +75,12 @@ const validateOrder = (req, res, next) => {
   const orderId = req.params.orderId;
   const foundOrder = orders.find((order) => order.id === orderId);
   if (foundOrder) {
+    // if ids are equal
     res.locals.order = foundOrder;
-    return next();
+    return next(); // Set locals then continue
   } else {
     return next({
+      //Otherwise throw to error middleware
       status: 404,
       message: `Order does not exist: ${req.params.orderId}`,
     });
@@ -168,25 +171,25 @@ const destroy = (req, res) => {
 module.exports = {
   create: [
     hasBodyData("deliverTo"),
-    hasBodyData("mobileNumber"),
+    hasBodyData("mobileNumber"), // determine if prop was entered
     hasBodyData("dishes"),
-    validateDish,
-    validateQuantity,
+    validateDish, // validate dish exists
+    validateQuantity, // validate correct quantity entered
     create,
   ],
   list,
-  read: [validateOrder, read],
+  read: [validateOrder, read], //validate order exists, get order based off id
   update: [
-    validateOrder,
-    matchOrder,
+    validateOrder, // validate order exists based off id
+    matchOrder, // match body id to query id
     hasBodyData("deliverTo"),
-    hasBodyData("mobileNumber"),
+    hasBodyData("mobileNumber"), //determine if body has specific params
     hasBodyData("dishes"),
     hasBodyData("status"),
-    verifyUpdated,
-    validateDish,
-    validateQuantity,
+    verifyUpdated, // verify that it hasn't been updated yet
+    validateDish, // verify dish exists
+    validateQuantity, // verify a valid quantity is entered
     update,
   ],
-  delete: [validateOrder, verifyDeleted, destroy],
+  delete: [validateOrder, verifyDeleted, destroy], // validate order exists, verify it hasn't been deleted, delete
 };

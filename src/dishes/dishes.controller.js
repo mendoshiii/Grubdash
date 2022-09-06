@@ -111,22 +111,26 @@ const list = (req, res) => {
 };
 
 module.exports = {
+  // POST Request
   create: [
     hasBodyData("name"),
-    hasBodyData("description"),
+    hasBodyData("description"), // determine if body has specific params
     hasBodyData("image_url"),
-    validPrice,
+    validPrice, // verify price is valid (int > 0)
     create,
   ],
-  read: [validDish, read],
+  // Return one dish (GET)
+  read: [validDish, read], // dish id is a real id
+  // PUT Request
   update: [
-    validDish,
-    dishMatcher,
+    validDish, // dish id is a real id
+    dishMatcher, // dish matches entered id
     hasBodyData("name"),
-    hasBodyData("description"),
-    validPrice,
+    hasBodyData("description"), //determine if body has specific params
+    validPrice, // verify price is valid (int > 0)
     hasBodyData("image_url"),
     update,
   ],
+  // show all data (GET)
   list,
 };
