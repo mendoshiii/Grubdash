@@ -9,8 +9,8 @@ const nextId = require("../utils/nextId");
 // [TODO: X] Implement the /orders handlers needed to make the tests pass
 
 // Validates based on entered (prop)
-const hasBodyData = (prop) => {
-  return function (req, res, next) {
+function hasBodyData(prop) {
+  return function _bodyHelper(req, res, next) {
     const { data = {} } = req.body;
     if (data[prop] && data[prop] !== "") {
       return next();
@@ -20,10 +20,10 @@ const hasBodyData = (prop) => {
       message: `Order must include a ${prop}`,
     });
   };
-};
+}
 
 // Validates if at least one dish is entered
-const validateDish = (req, res, next) => {
+function validateDish(req, res, next) {
   const { data: { dishes } = {} } = req.body;
   if (dishes.length !== 0 && Array.isArray(dishes)) {
     return next();
@@ -33,10 +33,10 @@ const validateDish = (req, res, next) => {
       message: `Order must include at least one dish`,
     });
   }
-};
+}
 
 // Checks for quantity
-const validateQuantity = (req, res, next) => {
+function validateQuantity(req, res, next) {
   const { data: { dishes } = {} } = req.body;
   dishes.forEach((dish, index) => {
     const quantity = dish.quantity;
@@ -48,10 +48,10 @@ const validateQuantity = (req, res, next) => {
     }
   });
   next();
-};
+}
 
 // POST handle a new order
-const create = (req, res) => {
+function create(req, res) {
   const { data: { deliverTo, mobileNumber, dishes, status } = {} } = req.body;
   const newOrder = {
     // sets to a default new order
@@ -63,15 +63,15 @@ const create = (req, res) => {
   };
   orders.push(newOrder);
   res.status(201).json({ data: newOrder });
-};
+}
 
 // GET request for all orders
-const list = (req, res) => {
+function list(req, res) {
   res.json({ data: orders }); // returns all orders data
-};
+}
 
 // Validate if order exists
-const validateOrder = (req, res, next) => {
+function validateOrder(req, res, next) {
   const orderId = req.params.orderId;
   const foundOrder = orders.find((order) => order.id === orderId);
   if (foundOrder) {
@@ -85,10 +85,10 @@ const validateOrder = (req, res, next) => {
       message: `Order does not exist: ${req.params.orderId}`,
     });
   }
-};
+}
 
 // PUT, does body id match orderId
-const matchOrder = (req, res, next) => {
+function matchOrder(req, res, next) {
   const orderId = req.params.orderId;
   const { data: { id } = {} } = req.body;
   if (id) {
@@ -103,15 +103,15 @@ const matchOrder = (req, res, next) => {
   } else {
     next();
   }
-};
+}
 
 // GETS data based off of one order
-const read = (req, res) => {
+function read(req, res) {
   res.json({ data: res.locals.order });
-};
+}
 
 // PUT handler
-const update = (req, res) => {
+function update(req, res) {
   const foundOrder = res.locals.order;
 
   const { data: { deliverTo, mobileNumber, dishes } = {} } = req.body;
@@ -121,10 +121,10 @@ const update = (req, res) => {
   foundOrder.dishes = dishes;
 
   res.json({ data: foundOrder });
-};
+}
 
 // Determines status of DELETE request
-const verifyDeleted = (req, res, next) => {
+function verifyDeleted(req, res, next) {
   const order = res.locals.order;
   if (order.status === "pending") {
     return next();
@@ -134,10 +134,10 @@ const verifyDeleted = (req, res, next) => {
       message: `An order cannot be deleted unless it is pending`,
     });
   }
-};
+}
 
 // Determines status of DELETE request (updated)
-const verifyUpdated = (req, res, next) => {
+function verifyUpdated(req, res, next) {
   const { data: { status } = {} } = req.body;
   if (
     !status ||
@@ -156,17 +156,17 @@ const verifyUpdated = (req, res, next) => {
     });
   }
   next();
-};
+}
 
 //Handle delete
-const destroy = (req, res) => {
+function destroy(req, res) {
   const order = res.locals.order;
   const index = orders.findIndex(
     (orderNum) => orderNum.id === Number(order.id)
   );
   orders.splice(index, 1);
   res.sendStatus(204);
-};
+}
 
 module.exports = {
   create: [

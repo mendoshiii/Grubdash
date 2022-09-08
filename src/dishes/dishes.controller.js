@@ -10,7 +10,7 @@ const nextId = require("../utils/nextId");
 // [TODO: X] Implement the /dishes handlers needed to make the tests pass
 
 // Used to validate required strings i.e 'name', 'description', and 'image_url'
-const hasBodyData = (prop) => {
+function hasBodyData(prop) {
   return (req, res, next) => {
     const { data = {} } = req.body;
     if (data[prop] && data[prop] !== "") {
@@ -21,10 +21,10 @@ const hasBodyData = (prop) => {
       message: `Dish must include a ${prop}`,
     });
   };
-};
+}
 
 // Validates dish exists
-const validDish = (req, res, next) => {
+function validDish(req, res, next) {
   const { dishId } = req.params;
   const foundDish = dishes.find((dish) => dish.id === dishId);
   if (foundDish) {
@@ -36,10 +36,10 @@ const validDish = (req, res, next) => {
       message: `Dish id does not exist ${dishId}`,
     });
   }
-};
+}
 
 // Checks if body is a valid price and integer
-const validPrice = (req, res, next) => {
+function validPrice(req, res, next) {
   const { data: { price } = {} } = req.body;
   if (Number(price) > 0 && typeof price === "number") {
     next();
@@ -49,10 +49,10 @@ const validPrice = (req, res, next) => {
       message: `Dish must havea a price that is an integer greater than 0`,
     });
   }
-};
+}
 
 // Checks that router dishId matches with body request id
-const dishMatcher = (req, res, next) => {
+function dishMatcher(req, res, next) {
   const { dishId } = req.params;
   const { data: { id } = {} } = req.body;
   if (id) {
@@ -66,10 +66,10 @@ const dishMatcher = (req, res, next) => {
   } else {
     next();
   }
-};
+}
 
 // Post method to create a new dish
-const create = (req, res) => {
+function create(req, res) {
   const {
     data: { name, description, price, image_url },
   } = req.body;
@@ -82,16 +82,16 @@ const create = (req, res) => {
   };
   dishes.push(newDish);
   res.status(201).json({ data: newDish });
-};
+}
 
 // Return one dish
-const read = (req, res) => {
+function read(req, res) {
   const dish = res.locals.dish;
   res.json({ data: dish });
-};
+}
 
 //Put request handling
-const update = (req, res) => {
+function update(req, res) {
   const dish = res.locals.dish;
   const {
     data: { name, description, price, image_url },
@@ -103,12 +103,12 @@ const update = (req, res) => {
   dish.image_url = image_url;
 
   res.json({ data: dish });
-};
+}
 
 //View all dishes
-const list = (req, res) => {
+function list(req, res) {
   res.json({ data: dishes });
-};
+}
 
 module.exports = {
   // POST Request
